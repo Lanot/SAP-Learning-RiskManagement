@@ -4,11 +4,13 @@
     {
       "source": "^/app/(.*)$",
       "localDir": "./",
-      "target": "$1"
+      "target": "$1",
+      "authenticationType": "xsuaa"
     },
     {
       "source": "^/service/(.*)$",
-      "destination": "srv-api"
+      "destination": "srv-api",
+      "authenticationType": "xsuaa"
     }
   ]
 }
