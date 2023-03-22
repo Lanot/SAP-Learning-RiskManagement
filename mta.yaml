@@ -24,7 +24,7 @@ modules:
           srv-url: ${default-url}
     requires:
       - name: risk-management-db
-      - name: risk-management-auth
+      - name: risk-management-uaa
 
   - name: risk-management-db-deployer
     type: hdb
@@ -33,6 +33,7 @@ modules:
       buildpack: nodejs_buildpack
     requires:
       - name: risk-management-db
+      - name: risk-management-uaa
 
   - name: risk-management
     type: approuter.nodejs
@@ -48,30 +49,29 @@ modules:
           name: srv-api # must be used in xs-app.json as well
           url: ~{srv-url}
           forwardAuthToken: true
-      - name: risk-management-auth
+      - name: risk-management-uaa
 
 resources:
-  - name: risk-management-auth
+  - name: risk-management-db
+    type: com.sap.xs.hdi-container
+    parameters:
+      service: hana
+      service-plan: hdi-shared
+
+  - name: risk-management-uaa
     type: org.cloudfoundry.managed-service
     parameters:
       service: xsuaa
       service-plan: application
       path: ./xs-security.json
       config:
-        xsappname: risk-management-${space}
-        tenant-mode: dedicated
+        xsappname: 'RiskManagement-${space}'
         role-collections:
-        - name: 'RiskManager-${space}'
-          description: Manage Risks
-          role-template-references:
-            - $XSAPPNAME.RiskManager
-        - name: 'RiskViewer-${space}'
-          description: View Risks
-          role-template-references:
-            - $XSAPPNAME.RiskViewer
-
-  - name: risk-management-db
-    type: com.sap.xs.hdi-container
-    parameters:
-      service: hana
-      service-plan: hdi-shared
+          - name: 'RiskManager-${space}'
+            description: Manage Risks
+            role-template-references:
+              - $XSAPPNAME.RiskManager
+          - name: 'RiskViewer-${space}'
+            description: View Risks
+            role-template-references:
+              - $XSAPPNAME.RiskViewer
