@@ -51,27 +51,7 @@ modules:
       - name: risk-management-auth
 
 resources:
-  - name: risk-management-db
-    type: com.sap.xs.hdi-container
-    parameters:
-      service: hana
-      service-plan: hdi-shared
-
   - name: risk-management-auth
-    type: org.cloudfoundry.managed-service
-    parameters:
-      service: xsuaa
-      service-plan: application
-      path: ./xs-security.json
-      config:
-        xsappname: risk-management #-${space}
-        tenant-mode: dedicated
-        oauth2-configuration:
-          redirect-uris:
-            # - https:///login/callback
-            - https://nitor-partners--llc-anatolii-lehkyi-j30qazsc-dev-risk-ma8ea805a.cfapps.us10-001.hana.ondemand.com/login/callback
-
-  - name: risk-management-uaa
     type: org.cloudfoundry.managed-service
     parameters:
       service: xsuaa
@@ -81,11 +61,17 @@ resources:
         xsappname: risk-management-${space}
         tenant-mode: dedicated
         role-collections:
-          - name: RiskManager
-            description: Manage Risks
-            role-template-references:
-              - $XSAPPNAME.RiskManager
-          - name: RiskViewer
-            description: View Risks
-            role-template-references:
-              - $XSAPPNAME.RiskViewer
+        - name: 'RiskManager-${space}'
+          description: Manage Risks
+          role-template-references:
+            - $XSAPPNAME.RiskManager
+        - name: 'RiskViewer-${space}'
+          description: View Risks
+          role-template-references:
+            - $XSAPPNAME.RiskViewer
+
+  - name: risk-management-db
+    type: com.sap.xs.hdi-container
+    parameters:
+      service: hana
+      service-plan: hdi-shared
